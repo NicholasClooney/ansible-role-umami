@@ -46,7 +46,7 @@ If you omit `umami_db_password` or `umami_app_secret`, the role generates crypto
 - hosts: umami_servers
   become: true
   roles:
-    - role: ansible-role-umami
+    - role: nicholasclooney.umami
       vars:
         umami_timezone: Europe/London
         umami_bind_address: 127.0.0.1

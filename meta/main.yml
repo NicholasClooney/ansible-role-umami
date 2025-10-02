@@ -1,6 +1,7 @@
 ---
 galaxy_info:
   role_name: umami
+  namespace: nicholasclooney
   author: Nicholas Clooney
   description: Deploys the Umami analytics stack via Docker Compose with hardened defaults.
   license: MIT
