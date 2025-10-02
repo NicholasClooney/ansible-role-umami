@@ -1,11 +1,15 @@
 ---
+umami_timezone: Europe/London
+
+# Config storage (remote)
 umami_base_dir: "/opt/umami"
 
-umami_timezone: Europe/London
+# Secrets storage (local controller)
+umami_secrets_dir: "{{ playbook_dir }}/.secrets/{{ inventory_hostname }}"
 
 # Container images
 umami_image: ghcr.io/umami-software/umami:postgresql-latest
-umami_postgres_image: postgres:16-alpine
+umami_postgres_image: postgres:18-alpine
 
 # Networking
 umami_listen_port: 3000

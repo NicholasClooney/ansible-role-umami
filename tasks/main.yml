@@ -1,5 +1,5 @@
 ---
-- name: Ensure base directory exists
+- name: Ensure base directory exists (remote)
   become: true
   ansible.builtin.file:
     path: "{{ umami_base_dir }}"
@@ -8,18 +8,34 @@
     group: root
     mode: "0755"
 
-- name: Generate DB password if needed
-  become: true
-  ansible.builtin.set_fact:
-    umami_db_password: "{{ lookup('password', umami_base_dir ~ '/.db_password chars=ascii_letters,digits length=32') }}"
-  when: umami_db_password | length == 0
+# --- Local secrets handling ---
+- name: Ensure local secrets dir exists (controller)
+  ansible.builtin.file:
+    path: "{{ umami_secrets_dir }}"
+    state: directory
+    mode: "0700"
+  delegate_to: localhost
+  run_once: false
 
-- name: Generate app secret if needed
-  become: true
+- name: Generate DB password if needed (local)
   ansible.builtin.set_fact:
-    umami_app_secret: "{{ lookup('password', umami_base_dir ~ '/.app_secret chars=hexdigits length=64') }}"
-  when: umami_app_secret | length == 0
+    umami_db_password: >-
+      {{ lookup('ansible.builtin.password',
+                umami_secrets_dir ~ '/.db_password chars=ascii_letters,digits length=32') }}
+  when: (umami_db_password | default('') | length) == 0
+  delegate_to: localhost
+  run_once: false
 
+- name: Generate app secret if needed (local)
+  ansible.builtin.set_fact:
+    umami_app_secret: >-
+      {{ lookup('ansible.builtin.password',
+                umami_secrets_dir ~ '/.app_secret chars=hexdigits length=64') }}
+  when: (umami_app_secret | default('') | length) == 0
+  delegate_to: localhost
+  run_once: false
+
+# --- Remote config + deployment ---
 - name: Render .env file
   become: true
   ansible.builtin.template:
