@@ -1,5 +1,6 @@
 ---
 - name: Ensure base directory exists
+  become: true
   ansible.builtin.file:
     path: "{{ umami_base_dir }}"
     state: directory
@@ -8,16 +9,19 @@
     mode: "0755"
 
 - name: Generate DB password if needed
+  become: true
   ansible.builtin.set_fact:
     umami_db_password: "{{ lookup('password', umami_base_dir ~ '/.db_password chars=ascii_letters,digits length=32') }}"
   when: umami_db_password | length == 0
 
 - name: Generate app secret if needed
+  become: true
   ansible.builtin.set_fact:
     umami_app_secret: "{{ lookup('password', umami_base_dir ~ '/.app_secret chars=hexdigits length=64') }}"
   when: umami_app_secret | length == 0
 
 - name: Render .env file
+  become: true
   ansible.builtin.template:
     src: env.j2
     dest: "{{ umami_base_dir }}/.env"
@@ -27,6 +31,7 @@
   notify: Restart umami stack
 
 - name: Render docker-compose.yml
+  become: true
   ansible.builtin.template:
     src: docker-compose.yml.j2
     dest: "{{ umami_base_dir }}/docker-compose.yml"
@@ -36,6 +41,7 @@
   notify: Restart umami stack
 
 - name: Ensure Umami stack is running
+  become: true
   community.docker.docker_compose_v2:
     project_src: "{{ umami_base_dir }}"
     project_name: "{{ umami_compose_project_name }}"
