@@ -1,5 +1,5 @@
 ---
-umami_base_dir: "{{ playbook_dir }}/umami"
+umami_base_dir: "/opt/umami"
 
 umami_timezone: Europe/London
 
