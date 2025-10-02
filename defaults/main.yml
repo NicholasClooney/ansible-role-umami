@@ -1,0 +1,22 @@
+---
+umami_base_dir: /usr/local/umami
+umami_timezone: Europe/London
+
+# Container images
+umami_image: ghcr.io/umami-software/umami:postgresql-latest
+umami_postgres_image: postgres:16-alpine
+
+# Networking
+umami_listen_port: 3000
+umami_bind_address: 127.0.0.1
+
+# Database
+umami_db_name: umami
+umami_db_user: umami
+umami_db_password: ""
+umami_app_secret: ""
+
+# Compose options
+umami_compose_project_name: umami
+umami_compose_pull: true
+umami_compose_recreate: auto

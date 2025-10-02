@@ -1,0 +1,25 @@
+---
+galaxy_info:
+  role_name: umami
+  author: Nicholas Clooney
+  description: Deploys the Umami analytics stack via Docker Compose with hardened defaults.
+  license: MIT
+  min_ansible_version: "2.14"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - "20.04"
+        - "22.04"
+    - name: Debian
+      versions:
+        - "11"
+        - "12"
+        - "13"
+  galaxy_tags:
+    - analytics
+    - docker
+    - monitoring
+    - observability
+collections:
+  - community.docker
+dependencies: []

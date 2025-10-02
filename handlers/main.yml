@@ -1,0 +1,6 @@
+---
+- name: Restart umami stack
+  community.docker.docker_compose_v2:
+    project_src: "{{ umami_base_dir }}"
+    project_name: "{{ umami_compose_project_name }}"
+    state: restarted

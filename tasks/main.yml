@@ -1,0 +1,50 @@
+---
+- name: Ensure base directory exists
+  ansible.builtin.file:
+    path: "{{ umami_base_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Generate DB password if needed
+  ansible.builtin.set_fact:
+    umami_db_password: "{{ lookup('password', umami_base_dir ~ '/.db_password chars=ascii_letters,digits length=32') }}"
+  when: umami_db_password | length == 0
+
+- name: Generate app secret if needed
+  ansible.builtin.set_fact:
+    umami_app_secret: "{{ lookup('password', umami_base_dir ~ '/.app_secret chars=hexdigits length=64') }}"
+  when: umami_app_secret | length == 0
+
+- name: Render .env file
+  ansible.builtin.template:
+    src: env.j2
+    dest: "{{ umami_base_dir }}/.env"
+    owner: root
+    group: root
+    mode: "0640"
+  notify: Restart umami stack
+
+- name: Render docker-compose.yml
+  ansible.builtin.template:
+    src: docker-compose.yml.j2
+    dest: "{{ umami_base_dir }}/docker-compose.yml"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart umami stack
+
+- name: Ensure Umami stack is running
+  community.docker.docker_compose_v2:
+    project_src: "{{ umami_base_dir }}"
+    project_name: "{{ umami_compose_project_name }}"
+    state: present
+    pull: "{{ umami_compose_pull }}"
+    recreate: "{{ umami_compose_recreate }}"
+  register: umami_compose_result
+
+- name: Display docker compose changes
+  ansible.builtin.debug:
+    var: umami_compose_result
+  when: umami_compose_result is defined
