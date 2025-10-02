@@ -1,5 +1,6 @@
 ---
-umami_base_dir: /usr/local/umami
+umami_base_dir: "{{ playbook_dir }}/umami"
+
 umami_timezone: Europe/London
 
 # Container images
@@ -18,5 +19,5 @@ umami_app_secret: ""
 
 # Compose options
 umami_compose_project_name: umami
-umami_compose_pull: true
+umami_compose_pull: always
 umami_compose_recreate: auto

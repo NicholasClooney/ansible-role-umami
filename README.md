@@ -33,7 +33,7 @@ All variables live in `defaults/main.yml`. Key options:
 | `umami_db_password` | `""` | If empty, the role generates and persists a 32-char password |
 | `umami_app_secret` | `""` | If empty, the role generates and persists a 64-char hex secret |
 | `umami_compose_project_name` | `umami` | Docker compose project name |
-| `umami_compose_pull` | `true` | Whether to pull the latest images on each run |
+| `umami_compose_pull` | `always` | Compose pull behavior (`always`, `missing`, `never`, `policy`) |
 | `umami_compose_recreate` | `auto` | Compose recreate behaviour (`auto`, `always`, `never`) |
 
 ## Secrets
