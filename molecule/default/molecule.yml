@@ -8,9 +8,14 @@ platforms:
     image: geerlingguy/docker-ubuntu2204-ansible:latest
     pre_build_image: true
     privileged: true
+    environment:
+      DOCKER_HOST: unix:///var/run/docker.sock
+    volumes:
+      - "${MOLECULE_DOCKER_SOCKET:-/var/run/docker.sock}:/var/run/docker.sock"
 provisioner:
   name: ansible
   playbooks:
+    prepare: prepare.yml
     converge: converge.yml
 verifier:
   name: ansible

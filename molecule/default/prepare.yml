@@ -1,0 +1,73 @@
+---
+- name: Prepare
+  hosts: all
+  become: true
+  vars:
+    docker_keyring: /etc/apt/keyrings/docker.gpg
+    # Map architecture (x86_64 -> amd64, aarch64 -> arm64, etc.)
+    arch_map:
+      x86_64: amd64
+      aarch64: arm64
+      armv7l: armhf
+      ppc64le: ppc64el
+      s390x: s390x
+    docker_arch: "{{ arch_map.get(ansible_architecture, ansible_architecture) }}"
+    distro_id: "{{ ansible_distribution | lower }}"              # ubuntu or debian
+    distro_codename: >-
+      {{ (ansible_lsb.codename | default(ansible_distribution_release)) | lower }}
+  tasks:
+    - name: Ensure base packages for repo/key management
+      ansible.builtin.apt:
+        name:
+          - ca-certificates
+          - curl
+          - gnupg
+          - lsb-release
+        state: present
+        update_cache: true
+
+    - name: Create keyring dir
+      ansible.builtin.file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: "0755"
+
+    - name: Install Docker's official GPG key
+      ansible.builtin.shell: |
+        curl -fsSL https://download.docker.com/linux/{{ distro_id }}/gpg | gpg --dearmor -o {{ docker_keyring }}
+        chmod a+r {{ docker_keyring }}
+      args:
+        creates: "{{ docker_keyring }}"
+
+    # Optional: nuke any wrong docker.list left from previous runs to avoid conflicts
+    - name: Remove mismatched Docker repo (if any)
+      ansible.builtin.file:
+        path: /etc/apt/sources.list.d/docker.list
+        state: absent
+
+    - name: Add Docker APT repository (Ubuntu or Debian)
+      ansible.builtin.copy:
+        dest: /etc/apt/sources.list.d/docker.list
+        mode: "0644"
+        content: |
+          deb [arch={{ docker_arch }} signed-by={{ docker_keyring }}] https://download.docker.com/linux/{{ distro_id }} {{ distro_codename }} stable
+
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+
+    - name: Install Docker CLI + Compose v2 plugin
+      ansible.builtin.apt:
+        name:
+          - docker-ce-cli
+          - docker-compose-plugin
+        state: present
+
+    # Optional sanity checks (won't change state)
+    - name: Check docker CLI
+      ansible.builtin.command: docker version
+      changed_when: false
+
+    - name: Check compose v2
+      ansible.builtin.command: docker compose version
+      changed_when: false

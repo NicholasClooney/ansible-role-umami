@@ -65,7 +65,11 @@ The role binds Umami to the loopback address by default. Publish HTTPS with a re
 A sample Molecule scenario is included. To run it (requires Docker locally):
 
 ```bash
-pip install molecule[docker]
+# On macOS/Colima, expose your Docker socket to Molecule
+export MOLECULE_DOCKER_SOCKET="$HOME/.colima/default/docker.sock"
+export DOCKER_HOST="unix://$MOLECULE_DOCKER_SOCKET"
+
+pip install -r requirements.txt
 molecule test
 ```
 
