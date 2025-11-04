@@ -2,6 +2,8 @@
 
 Deploys [Umami](https://umami.is) using Docker Compose with hardened defaults. The role lays down a production-focused `docker-compose.yml`, manages secrets via a `.env` file, and ensures the stack is running.
 
+For a full walkthrough of how this setup works, see my blog post: [Private Analytics With Umami, Docker Compose, and Ansible](https://blog.nicholas.clooney.io/posts/deploying-umami-ansible-docker/)
+
 ## Requirements
 
 - Target host already has Docker Engine and Docker Compose v2.
